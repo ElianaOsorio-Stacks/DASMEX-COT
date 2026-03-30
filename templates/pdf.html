@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+
+<style>
+@page {
+    size: A4;
+    margin: 25mm; /* margen invisible correcto */
+}
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    color: #222;
+    font-size: 15px; /* 🔥 más grande */
+}
+
+/* ===== CONTENEDOR ===== */
+.container {
+    width: 100%;
+}
+
+/* ===== LOGO ===== */
+.logo {
+    width: 240px;
+    margin-bottom: 10px;
+}
+
+/* ===== TITULO ===== */
+.titulo {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.meta {
+    font-size: 15px;
+    margin-bottom: 25px;
+    font-weight: bold;
+}
+
+/* ===== INFO ===== */
+.info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.seller {
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.seller strong {
+    font-size: 16px;
+}
+
+.cliente {
+    text-align: center;
+    min-width: 240px;
+}
+
+.cliente-title {
+    background: #0a7fa5;
+    color: white;
+    padding: 8px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.cliente-body {
+    padding: 8px;
+    font-size: 15px;
+}
+
+/* ===== TABLA ===== */
+.table-container {
+    display: flex;
+    justify-content: center;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 14px;
+}
+
+th {
+    background: #0a7fa5;
+    color: white;
+    padding: 12px;
+    border: 1px solid #555;
+    font-weight: bold;
+}
+
+td {
+    padding: 10px;
+    border: 1px solid #555;
+    text-align: center;
+}
+
+td.producto {
+    text-align: left;
+}
+
+/* FILAS */
+tr:nth-child(even) {
+    background: #e6f5f9;
+}
+
+/* ===== TOTALES ===== */
+.totales {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.totales table {
+    width: 350px;
+}
+
+.totales td {
+    padding: 12px;
+    border: 1px solid #555;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.total-final {
+    background: #0a7fa5;
+    color: white;
+    font-size: 16px;
+}
+
+/* ===== SALTO ===== */
+.page-break {
+    page-break-before: always;
+}
+
+/* ===== OBS ===== */
+.obs {
+    margin-top: 50px;
+    font-size: 15px;
+    text-align: left;
+    line-height: 2;
+}
+
+.obs-title {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+/* ===== FIRMA ===== */
+.firma {
+    margin-top: 100px;
+    text-align: center;
+}
+
+.firma img {
+    width: 180px;
+}
+
+.linea {
+    margin: 25px auto;
+    width: 300px;
+    border-top: 2px solid black;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<img src="file:///{{ ruta_static }}/marca.png" class="logo">
+
+<div class="titulo">COTIZACIÓN DASMEX</div>
+
+<div class="meta">
+FOLIO: {{ folio }}<br>
+FECHA: {{ fecha }}
+</div>
+
+<div class="info">
+<div class="seller">
+<strong>Lic. Daniel Cardoso</strong><br>
+Vendedor: 01<br>
+Tel: (+52) 938 246 0069<br>
+Email: compras@dasmexinternational.com
+</div>
+
+<div class="cliente">
+<div class="cliente-title">CLIENTE</div>
+<div class="cliente-body">{{ cliente }}</div>
+</div>
+</div>
+
+<div class="table-container">
+<table>
+<tr>
+<th>CANT</th>
+<th>UNIDAD</th>
+<th>MEDIDA</th>
+<th>PRODUCTO</th>
+<th>CLAVE</th>
+<th>SAT</th>
+<th>P. UNIT</th>
+<th>TOTAL</th>
+</tr>
+
+{% for item in items %}
+<tr>
+<td>{{ item.cantidad }}</td>
+<td>{{ item.unidad }}</td>
+<td>{{ item.medida }}</td>
+<td class="producto">{{ item.producto }}</td>
+<td>{{ item.codigo }}</td>
+<td>{{ item.clave_sat }}</td>
+<td>${{ item.precio }}</td>
+<td>${{ item.total }}</td>
+</tr>
+{% endfor %}
+</table>
+</div>
+
+<div class="totales">
+<table>
+<tr><td>SUBTOTAL</td><td>${{ subtotal }}</td></tr>
+<tr><td>DESC (3.5%)</td><td>${{ descuento }}</td></tr>
+<tr><td>IVA (16%)</td><td>${{ iva }}</td></tr>
+<tr class="total-final"><td>TOTAL</td><td>${{ total }}</td></tr>
+</table>
+</div>
+
+</div>
+
+<!-- PAGINA 2 -->
+<div class="page-break"></div>
+
+<div class="container">
+
+<img src="file:///{{ ruta_static }}/marca.png" class="logo">
+
+<div class="obs">
+<div class="obs-title">OBSERVACIONES</div>
+
+A) CONDICIONES DE PAGO: Pago a crédito 90 días<br>
+B) TIEMPO DE ENTREGA: 3-5 días hábiles<br>
+C) VIGENCIA DE LA OFERTA: 28 de febrero del 2026<br>
+D) DIRECCIÓN DE ENTREGA: Playa del Carmen, Quintana Roo<br>
+E) DISPONIBILIDAD: Material inmediato
+</div>
+
+<div class="firma">
+<div><strong>Firma de autorización</strong></div>
+<div class="linea"></div>
+<img src="file:///{{ ruta_static }}/firma.png">
+</div>
+
+</div>
+
+</body>
+</html>
