@@ -29,6 +29,14 @@
             margin-bottom: 20px;
         }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
         .header h1 {
             margin: 0;
             color: #0aa6b5;
@@ -38,6 +46,27 @@
         .logo {
             height: 64px;
             object-fit: contain;
+        }
+
+        .nav-link {
+            color: #0aa6b5;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+
+        .user-badge {
+            background: #eef9fb;
+            border: 1px solid #cbeef2;
+            border-radius: 999px;
+            color: #0a7f8b;
+            font-size: 13px;
+            font-weight: bold;
+            padding: 8px 12px;
         }
 
         .cliente-box {
@@ -58,13 +87,70 @@
         }
 
         input[type="text"],
-        input[type="number"] {
+        input[type="number"],
+        input[type="file"] {
             width: 100%;
             box-sizing: border-box;
             padding: 10px 12px;
             border: 1px solid #c8d0d7;
             border-radius: 8px;
             font-size: 14px;
+        }
+
+        .catalogo-panel {
+            background: #eef9fb;
+            border: 1px solid #cbeef2;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .catalogo-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            align-items: end;
+        }
+
+        .catalogo-grid .wide {
+            grid-column: span 2;
+        }
+
+        .catalogo-actions {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 14px;
+            align-items: end;
+            margin-top: 14px;
+        }
+
+        .panel-title {
+            margin: 0 0 12px;
+            color: #0a7f8b;
+            font-size: 18px;
+        }
+
+        .messages {
+            margin-bottom: 16px;
+        }
+
+        .message {
+            border-radius: 8px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            padding: 10px 12px;
+        }
+
+        .message.success {
+            background: #e7f8ec;
+            color: #1e7a38;
+            border: 1px solid #bde8c8;
+        }
+
+        .message.error {
+            background: #fff0f0;
+            color: #a22929;
+            border: 1px solid #f1c1c1;
         }
 
         .tabla-wrapper {
@@ -164,13 +250,79 @@
             margin-top: -8px;
             margin-bottom: 12px;
         }
+
+        @media (max-width: 900px) {
+            .catalogo-grid,
+            .catalogo-actions,
+            .cliente-box {
+                grid-template-columns: 1fr;
+            }
+
+            .catalogo-grid .wide {
+                grid-column: auto;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
         <h1>Cotizador DASMEX</h1>
-        <img src="{{ url_for('static', filename='Logo.png') }}" alt="Logo DASMEX" class="logo">
+        <div class="header-actions">
+            <span class="user-badge">{{ session.get("nombre", session.get("usuario")) }}</span>
+            {% if session.get("rol") == "admin" %}
+                <a href="{{ url_for('admin_usuarios') }}" class="nav-link">Panel admin</a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}" class="nav-link">Cerrar sesion</a>
+            <img src="{{ url_for('static', filename='Logo.png') }}" alt="Logo DASMEX" class="logo">
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="messages">
+                {% for category, message in messages %}
+                    <div class="message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="catalogo-panel">
+        <h2 class="panel-title">Agregar producto al catalogo</h2>
+        <form action="/agregar_producto" method="POST">
+            <div class="catalogo-grid">
+                <div>
+                    <label for="medida">Unidad / Medida</label>
+                    <input type="text" id="medida" name="medida" placeholder="Ej. PZA, CAJA, KG">
+                </div>
+                <div class="wide">
+                    <label for="producto">Producto</label>
+                    <input type="text" id="producto" name="producto" required placeholder="Nombre del producto">
+                </div>
+                <div>
+                    <label for="codigo_sku">Codigo SKU</label>
+                    <input type="text" id="codigo_sku" name="codigo_sku" placeholder="SKU">
+                </div>
+                <div>
+                    <label for="clave_sat">Clave SAT</label>
+                    <input type="text" id="clave_sat" name="clave_sat" placeholder="Clave SAT">
+                </div>
+                <div>
+                    <button type="submit" class="btn">Agregar producto</button>
+                </div>
+            </div>
+        </form>
+
+        <form action="/cargar_excel" method="POST" enctype="multipart/form-data">
+            <div class="catalogo-actions">
+                <div>
+                    <label for="archivo_excel">Agregar productos desde otro Excel</label>
+                    <input type="file" id="archivo_excel" name="archivo_excel" accept=".xlsx,.xls" required>
+                </div>
+                <button type="submit" class="btn">Cargar Excel</button>
+            </div>
+        </form>
     </div>
 
     <form action="/generar_pdf" method="POST" id="cotizadorForm">

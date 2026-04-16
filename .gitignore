@@ -1,1 +1,7 @@
+__pycache__/
+*.pyc
 
+flask_server*.log
+pdfs/*.pdf
+usuarios.json
+~$*.xlsx

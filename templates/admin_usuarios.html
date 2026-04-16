@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Admin DASMEX</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f5f7;
+            color: #222;
+            margin: 0;
+            padding: 24px;
+        }
+
+        .container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+            margin: 0 auto;
+            max-width: 1100px;
+            padding: 24px;
+        }
+
+        .header {
+            align-items: center;
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #0aa6b5;
+            font-size: 28px;
+            margin: 0;
+        }
+
+        .logo {
+            height: 64px;
+            object-fit: contain;
+        }
+
+        .panel {
+            background: #eef9fb;
+            border: 1px solid #cbeef2;
+            border-radius: 12px;
+            margin-bottom: 22px;
+            padding: 16px;
+        }
+
+        .panel h2 {
+            color: #0a7f8b;
+            font-size: 18px;
+            margin: 0 0 14px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 14px;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            align-items: end;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        input {
+            border: 1px solid #c8d0d7;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+            padding: 10px 12px;
+            width: 100%;
+        }
+
+        .btn {
+            background: #0aa6b5;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 14px 22px;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: #088d99;
+        }
+
+        .nav-link {
+            color: #0aa6b5;
+            font-weight: bold;
+            margin-left: 12px;
+            text-decoration: none;
+        }
+
+        .message,
+        .credentials {
+            border-radius: 8px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding: 10px 12px;
+        }
+
+        .message.success,
+        .credentials {
+            background: #e7f8ec;
+            border: 1px solid #bde8c8;
+            color: #1e7a38;
+        }
+
+        .message.error {
+            background: #fff0f0;
+            border: 1px solid #f1c1c1;
+            color: #a22929;
+        }
+
+        table {
+            border-collapse: collapse;
+            min-width: 850px;
+            width: 100%;
+        }
+
+        th {
+            background: #0aa6b5;
+            border: 1px solid #888;
+            color: #fff;
+            padding: 10px 8px;
+            text-align: center;
+        }
+
+        td {
+            border: 1px solid #b4b4b4;
+            padding: 8px;
+            text-align: center;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #e8f7f9;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Panel de usuarios</h1>
+        <div>
+            <a href="{{ url_for('index') }}" class="nav-link">Cotizador</a>
+            <a href="{{ url_for('logout') }}" class="nav-link">Cerrar sesion</a>
+            <img src="{{ url_for('static', filename='Logo.png') }}" alt="Logo DASMEX" class="logo">
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if credenciales_generadas %}
+        <div class="credentials">
+            Usuario generado para {{ credenciales_generadas.nombre }}:<br>
+            Usuario: {{ credenciales_generadas.usuario }}<br>
+            Contrasena: {{ credenciales_generadas.password }}
+        </div>
+    {% endif %}
+
+    <div class="panel">
+        <h2>Generar usuario y contrasena</h2>
+        <form action="{{ url_for('admin_usuarios') }}" method="POST">
+            <div class="grid">
+                <div>
+                    <label for="nombre">Nombre completo</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                </div>
+                <div>
+                    <label for="cargo">Cargo</label>
+                    <input type="text" id="cargo" name="cargo" required>
+                </div>
+                <div>
+                    <label for="anio_nacimiento">Ano de nacimiento</label>
+                    <input type="number" id="anio_nacimiento" name="anio_nacimiento" min="1900" max="2100" required>
+                </div>
+                <div>
+                    <label for="admin_password">Contrasena admin</label>
+                    <input type="password" id="admin_password" name="admin_password" required>
+                </div>
+                <button type="submit" class="btn">Generar acceso</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Nombre</th>
+                    <th>Cargo</th>
+                    <th>Ano nacimiento</th>
+                    <th>Rol</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario, data in usuarios.items() %}
+                    <tr>
+                        <td>{{ usuario }}</td>
+                        <td>{{ data.nombre }}</td>
+                        <td>{{ data.cargo }}</td>
+                        <td>{{ data.anio_nacimiento }}</td>
+                        <td>{{ data.rol }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
